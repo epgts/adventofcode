@@ -3,26 +3,43 @@
 use v5.12;
 use warnings;
 
-use List::Util 'sum';
+use List::Util qw'max sum';
 
 =head1 rocketeq
 
 =over
 
-=item fuel_of_mass($mass)
+=item base_fuel_of_mass($mass)
 
 Compute the amount of fuel required to move $mass.
+Does not account for the fuel needed to move the fuel.
+
+=cut
+
+sub base_fuel_of_mass {
+    my $mass = shift;
+    max(0, int($mass / 3) - 2)
+}
+
+=item fuel_of_mass($mass)
+
+Compute the amount of fuel required to move $mass,
+including the fuel needed to move the fueld.
 
 =cut
 
 sub fuel_of_mass {
-    my $mass = shift;
-    int($mass / 3) - 2
+    my $total_fuel = 0;
+    for (my ($mass, $fuel) = shift; $mass > 0; $mass = $fuel) {
+        $total_fuel += $fuel = base_fuel_of_mass($mass);
+    }
+    $total_fuel
 }
 
 =item total_fuel_of_masses(@masses)
 
-Compute the total amount of fuel required to move all @masses.
+Compute the total amount of fuel required to move all @masses,
+including the fuel needed to move the fueld.
 
 =cut
 
