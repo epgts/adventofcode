@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+use List::Util 'sum';
+
+=head1 rocketeq
+
+=over
+
+=item fuel_of_mass($mass)
+
+Compute the amount of fuel required to move $mass.
+
+=cut
+
+sub fuel_of_mass {
+    my $mass = shift;
+    int($mass / 3) - 2
+}
+
+=item total_fuel_of_masses(@masses)
+
+Compute the total amount of fuel required to move all @masses.
+
+=cut
+
+sub total_fuel_of_masses {
+    sum map { fuel_of_mass($_) } @_
+}
+
+=back
+
+=cut
+
+if (!caller) {
+    say total_fuel_of_masses(<<>>);
+}
+
+1;
