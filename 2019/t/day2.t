@@ -1,7 +1,7 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 require './intcode';
 
@@ -18,4 +18,7 @@ ok interpret([1,1,1,4,99,5,6,0,99]),
     eq_array[30,1,1,4,2,5,6,0,99];
 
 open(my $fh, '<', 'input/day2') or die;
-is fix1201_str(<$fh>), 3_765_464
+my $input = <$fh>;
+is fix1201_str($input), 3_765_464;
+
+is fix1201_find($input), 7610;

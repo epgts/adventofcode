@@ -88,12 +88,31 @@ sub fix1201_str {
     fix1201(\@buffer)
 }
 
+sub fix1201_find {
+    my $s = shift;
+    my @input = split(/,\s*/, $s);
+    if ($input[0] == 19_690_720) {
+        return 100 * $input[1] + $input[2];
+    }
+    for my $noun (0..99) {
+        for my $verb (0..99) {
+            my @buf = @input;
+            $buf[1] = $noun;
+            $buf[2] = $verb;
+            interpret(\@buf);
+            if ($buf[0] == 19_690_720) {
+                return 100 * $noun + $verb;
+            }
+        }
+    }
+}
+
 =back
 
 =cut
 
 if (!caller) {
-    say fix1201_str(<<>>);
+    say fix1201_find(<<>>);
 }
 
 1;
