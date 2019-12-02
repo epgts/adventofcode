@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+=head1 intcode
+
+=over
+
+=item $index = add(\@buffer, $index)
+
+Add together numbers read from two positions and stores the result in a third
+position.  The three integers immediately after the opcode tell you these three
+positions - the first two indicate the positions from which you should read the
+input values, and the third indicates the position at which the output should be
+stored.
+
+=cut
+
+sub add {
+    my $buffer = shift;
+    my $index = shift;
+    my ($addr1, $addr2, $result_addr) = @$buffer[$index .. $index + 2];
+    $buffer->[$result_addr] = $buffer->[$addr1] + $buffer->[$addr2];
+    $index + 3
+}
+
+=item $index = mult(\@buffer, $index)
+
+Opcode 2 works exactly like opcode 1, except it multiplies the two inputs
+instead of adding them.  Again, the three integers after the opcode indicate
+where the inputs and outputs are, not their values.
+
+=cut
+
+sub mult {
+    my $buffer = shift;
+    my $index = shift;
+    my ($addr1, $addr2, $result_addr) = @$buffer[$index .. $index + 2];
+    $buffer->[$result_addr] = $buffer->[$addr1] * $buffer->[$addr2];
+    $index + 3
+}
+
+=item $index = halt(\@buffer, $index)
+
+Halt execution by returning the length of the array.
+
+=cut
+
+sub halt {
+    my $buffer = shift;
+    defined($buffer) || die;
+    scalar(@$buffer)
+}
+
+my %opcodes = (
+     1 => \&add,
+     2 => \&mult,
+    99 => \&halt,
+);
+
+=item interpret(\@buffer)
+
+Interpret instructions in @buffer, which is mutated in place.
+Return reference to @buffer for convenience.
+
+=cut
+
+sub interpret {
+    my $buffer = shift;
+    for (my $index = 0; $index < @$buffer;) {
+        $index = $opcodes{$buffer->[$index]}->($buffer, $index + 1);
+    }
+    $buffer
+}
+
+sub fix1201 {
+    my $buffer = shift;
+    $buffer->[1] = 12;
+    $buffer->[2] = 2;
+    interpret($buffer);
+    $buffer->[0]
+}
+
+sub fix1201_str {
+    my $s = shift;
+    my @buffer = split(/,\s*/, $s);
+    fix1201(\@buffer)
+}
+
+=back
+
+=cut
+
+if (!caller) {
+    say fix1201_str(<<>>);
+}
+
+1;
