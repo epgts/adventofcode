@@ -1,7 +1,7 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 require './intcode';
 
@@ -17,8 +17,16 @@ ok interpret([2,4,4,5,99,0]),
 ok interpret([1,1,1,4,99,5,6,0,99]),
     eq_array[30,1,1,4,2,5,6,0,99];
 
-open(my $fh, '<', 'input/day2') or die;
-my $input = <$fh>;
-is fix1201_str($input), 3_765_464;
+{
+    open(my $fh, '<', 'input/day2') or die;
+    my $input = <$fh>;
+    is fix1201_str($input), 3_765_464;
+    is fix1201_find($input), 7610;
+}
 
-is fix1201_find($input), 7610;
+{
+    open(my $fh, '-|', './intcode.exe') or die;
+    my $input = <$fh>;
+    $input =~ s/\r?\n//;
+    is $input, 7610;
+}

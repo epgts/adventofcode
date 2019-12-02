@@ -8,12 +8,16 @@ day2.h: GNUmakefile
 	echo 'int *DAY2; int DAY2_LEN;' > $@
 
 CC=	x86_64-w64-mingw32-gcc.exe
+CC=	gcc
 CFLAGS=	-O3 -Wall
 day2.o: day2.c
 intcode.o: intcode.c day2.h GNUmakefile
 intcode.exe: intcode.o day2.o GNUmakefile
 	${CC} -o $@ intcode.o day2.o
 
+test: all
+	prove -r t
+
 clean:
 	rm -f day2.c day2.h day2.o intcode.o intcode.exe
-.PHONY: all clean
+.PHONY: all test clean
