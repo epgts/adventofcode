@@ -10,7 +10,7 @@
 /* input values, and the third indicates the position at which the output should be */
 /* stored. */
 static int
-add(int* buf, int index)
+add(int *buf, const size_t _, int index)
 {
      int addr1 = buf[index++];
      int addr2 = buf[index++];
@@ -23,7 +23,7 @@ add(int* buf, int index)
 /* instead of adding them.  Again, the three integers after the opcode indicate */
 /* where the inputs and outputs are, not their values. */
 static int
-mult(int* buf, int index)
+mult(int *buf, const size_t _, int index)
 {
      int addr1 = buf[index++];
      int addr2 = buf[index++];
@@ -32,31 +32,34 @@ mult(int* buf, int index)
      return index;
 }
 
-/* Halt execution by returning -1. */
+/* Halt execution by returning len. */
 static int
-halt(int* _, int _i)
+halt(int *_, const size_t len, int _i)
 {
-     return -1;
+     return len;
 }
 
-typedef int (*instruction_t)(int*, int);
-instruction_t opcodes[100] = {
+typedef int (*instruction_t)(int *, size_t, int);
+instruction_t instructions[100] = {
      NULL,
      &add,
      &mult,
 };
 
 static void
-interpret(int *buf, size_t len)
+interpret(int *buf, const size_t len)
 {
-     for (int index = 0; index < len && index >= 0;) {
-          index = opcodes[buf[index]](buf, index + 1);
+     for (int index = 0; index < len;) {
+          index = instructions[buf[index]](buf, len, index + 1);
      }
 }
 
 static int
-fix1201(int *buf, size_t len)
+fix1201(const int *const input, const size_t len)
 {
+     // we don't care to free this
+     int *buf = malloc(len * sizeof *buf);
+     memcpy(buf, input, len * sizeof *buf);
      buf[1] = 12;
      buf[2] = 2;
      interpret(buf, len);
@@ -64,7 +67,7 @@ fix1201(int *buf, size_t len)
 }
 
 static int
-fix1201_find(const int *const input, size_t len)
+fix1201_find(const int *const input, const size_t len)
 {
      if (input[0] == 19690720) {
           return 100 * input[1] + input[2];
@@ -88,7 +91,7 @@ fix1201_find(const int *const input, size_t len)
 int
 main(int argc, char **argv)
 {
-     opcodes[99] = &halt;
+     instructions[99] = &halt;
      if (0) {
           printf("%d\n", fix1201(DAY2, DAY2_LEN));
      } else {
