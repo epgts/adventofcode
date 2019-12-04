@@ -62,6 +62,74 @@ sub closest_intersection {
     $lowest_distance
 }
 
+sub fewest_combined_steps {
+    my $wire1 = shift;
+    my $wire2 = shift;
+    my %points;
+    my ($x, $y) = (0, 0);
+    my $wire1_steps = 0;
+    for (@$wire1) {
+        if (s/^([LR])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $x += $direction;
+                $wire1_steps++;
+                my $key = join(',', $x, $y);
+                if (!exists($points{$key})) {
+                    $points{$key} = $wire1_steps;
+                }
+            }
+        } elsif (s/^([DU])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $y += $direction;
+                $wire1_steps++;
+                my $key = join(',', $x, $y);
+                if (!exists($points{$key})) {
+                    $points{$key} = $wire1_steps;
+                }
+            }
+        }
+    }
+    my $wire2_steps = 0;
+    my $fewest_steps;
+    $x = $y = 0;
+    for (@$wire2) {
+        if (s/^([LR])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $x += $direction;
+                $wire2_steps++;
+                my $key = join(',', $x, $y);
+                $wire1_steps = $points{$key};
+                if (defined($wire1_steps)) {
+                    my $steps = $wire1_steps + $wire2_steps;
+                    if (!defined($fewest_steps)
+                        || $steps < $fewest_steps) {
+                        $fewest_steps = $steps;
+                    }
+                }
+            }
+        } elsif (s/^([DU])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $y += $direction;
+                $wire2_steps++;
+                my $key = join(',', $x, $y);
+                $wire1_steps = $points{$key};
+                if (defined($wire1_steps)) {
+                    my $steps = $wire1_steps + $wire2_steps;
+                    if (!defined($fewest_steps)
+                        || $steps < $fewest_steps) {
+                        $fewest_steps = $steps;
+                    }
+                }
+            }
+        }
+    }
+    $fewest_steps
+}
+
 if (!caller) {
     say closest_intersection(map { my @directions = split(/\s*,\s*/); \@directions } <<>>);
 }
