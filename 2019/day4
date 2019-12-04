@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+sub check {
+    my $n = shift;
+    my $adjacent_same = 0;
+    my @digits = split('', $n);
+    my $lastdigit = shift(@digits);
+    for (my $digit = shift(@digits); defined($digit); $digit = shift(@digits)) {
+        $adjacent_same ||= $digit eq $lastdigit;
+        if ($digit < $lastdigit) {
+            return 0;
+        }
+        $lastdigit = $digit;
+    }
+    $adjacent_same
+}
+
+if (!caller) {
+    my $count = 0;
+    for my $n (272091..815432) {
+        $count += check($n);
+    }
+    say $count;
+}
+
+1;
