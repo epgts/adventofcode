@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+my %directions = (
+    L => 1,
+    U => 1,
+    R => -1,
+    D => -1,
+    );
+
+sub closest_intersection {
+    my $wire1 = shift;
+    my $wire2 = shift;
+    my %points;
+    my ($x, $y) = (0, 0);
+    for (@$wire1) {
+        if (s/^([LR])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $x += $direction;
+                $points{join(',', $x, $y)}++;
+            }
+        } elsif (s/^([DU])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $y += $direction;
+                $points{join(',', $x, $y)}++;
+            }
+        }
+    }
+    my $lowest_distance;
+    $x = $y = 0;
+    for (@$wire2) {
+        if (s/^([LR])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $x += $direction;
+                if (exists($points{join(',', $x, $y)})) {
+                    my $distance = abs($x) + abs($y);
+                    if (!defined($lowest_distance)
+                        || $distance < $lowest_distance) {
+                        $lowest_distance = $distance;
+                    }
+                }
+            }
+        } elsif (s/^([DU])//) {
+            my $direction = $directions{$1};
+            for (my $i = 0; $i < $_; $i++) {
+                $y += $direction;
+                if (exists($points{join(',', $x, $y)})) {
+                    my $distance = abs($x) + abs($y);
+                    if (!defined($lowest_distance)
+                        || $distance < $lowest_distance) {
+                        $lowest_distance = $distance;
+                    }
+                }
+            }
+        }
+    }
+    $lowest_distance
+}
+
+if (!caller) {
+    say closest_intersection(map { my @directions = split(/\s*,\s*/); \@directions } <<>>);
+}
+
+1;
