@@ -6,8 +6,8 @@ use warnings;
 sub orbits {
     my %direct;
     for (@_) {
-        chomp;
         my ($object, $orbiter) = split(/\)/);
+        chomp($orbiter);
         say "$object $orbiter";
         $direct{$orbiter} = $object;
     }
@@ -20,8 +20,46 @@ sub orbits {
     $orbits
 }
 
+sub orbital_transfer {
+    my %direct;
+    for (@_) {
+        my ($object, $orbiter) = split(/\)/);
+        chomp($orbiter);
+        $orbiter =~ s/\r?$//;
+        $direct{$orbiter} = $object;
+    }
+    my @you_path = path(\%direct, 'YOU');
+    my @san_path = path(\%direct, 'SAN');
+    say join('.', @you_path);
+    say join('.', @san_path);
+
+    for (my $i = 0; @you_path && @san_path; $i++) {
+        if ($you_path[0] eq $san_path[0]) {
+            shift(@you_path);
+            shift(@san_path);
+        } else {
+            last;
+        }
+    }
+    say 'now';
+    say join('.', @you_path);
+    say join('.', @san_path);
+    @you_path + @san_path - 2
+}
+
+sub path {
+    my $direct = shift;
+    my $target = shift;
+    my $object = $direct->{$target};
+    my @path = ($object, $target);
+    for (my $indirect = $direct->{$object}; defined($indirect); $indirect = $direct->{$indirect}) {
+        unshift(@path, $indirect);
+    }
+    @path
+}
+
 if (!caller) {
-   say orbits(<<>>);
+   say orbital_transfer(<<>>);
 }
 
 1;
