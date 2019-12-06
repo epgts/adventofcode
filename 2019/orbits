@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+sub orbits {
+    my %direct;
+    for (@_) {
+        chomp;
+        my ($object, $orbiter) = split(/\)/);
+        say "$object $orbiter";
+        $direct{$orbiter} = $object;
+    }
+    my $orbits = keys(%direct);
+    for my $object (values(%direct)) {
+        for (my $indirect = $direct{$object}; defined($indirect); $indirect = $direct{$indirect}) {
+            $orbits++;
+        }
+    }
+    $orbits
+}
+
+if (!caller) {
+   say orbits(<<>>);
+}
+
+1;
