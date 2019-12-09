@@ -4,12 +4,14 @@ use v5.12;
 use warnings;
 
 sub checksum {
+    my $width = shift;
+    my $height = shift;
     my $line = shift;
     chomp $line;
     my @sif = split //, $line;
-    my $layer_len = 25 * 6;
+    my $layer_len = $width * $height;
     my ($want_zero, $want_product);
-    for (my $rend = $layer_len; $rend < @sif; $rend += $layer_len) {
+    for (my $rend = $layer_len; $rend-1 < @sif; $rend += $layer_len) {
         my $rbeg = $rend - $layer_len;
         my ($zero, $one, $two);
         for my $e (@sif[$rbeg .. $rend-1]) {
@@ -29,8 +31,42 @@ sub checksum {
     $want_product
 }
 
+sub decode {
+    my $width = shift;
+    my $height = shift;
+    my $line = shift;
+    chomp $line;
+    my @sif = split //, $line;
+    my $layer_len = $width * $height;
+    for (my $rend = $layer_len; $rend-1 < @sif; $rend += $layer_len) {
+        my ($i, $rbeg) = (0, $rend - $layer_len);
+        my @s = @sif[$rbeg .. $rend-1];
+        for my $e (@sif[$rbeg .. $rend-1]) {
+            if ($sif[$i] eq 2) {
+                if ($e == 0) {
+                    $sif[$i] = $e;
+                } elsif ($e == 1) {
+                    $sif[$i] = $e;
+                }
+            }
+            $i++
+        }
+    }
+    my @result;
+    my @l = (' ', 'O');
+    for (my $i = 0; $i < $layer_len; $i++) {
+        push @result, $l[$sif[$i]];
+        if (($i + 1) % 25 == 0) {
+            push @result, "\n";
+        }
+    }
+    join('', @result);
+}
+
 if (!caller) {
-    say checksum(<<>>);
+    my $line = <<>>;
+    say checksum(25, 6, $line);
+    say decode(25, 6, $line);
 }
 
 1;
