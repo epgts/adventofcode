@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+sub checksum {
+    my $line = shift;
+    chomp $line;
+    my @sif = split //, $line;
+    my $layer_len = 25 * 6;
+    my ($want_zero, $want_product);
+    for (my $rend = $layer_len; $rend < @sif; $rend += $layer_len) {
+        my $rbeg = $rend - $layer_len;
+        my ($zero, $one, $two);
+        for my $e (@sif[$rbeg .. $rend-1]) {
+            if ($e == 0) {
+                $zero++;
+            } elsif ($e == 1) {
+                $one++;
+            } elsif ($e == 2) {
+                $two++;
+            }
+        }
+        if (!defined($want_zero) or $zero < $want_zero) {
+            $want_zero = $zero;
+            $want_product = $one * $two;
+        }
+    }
+    $want_product
+}
+
+if (!caller) {
+    say checksum(<<>>);
+}
+
+1;
