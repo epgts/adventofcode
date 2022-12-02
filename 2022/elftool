@@ -34,6 +34,19 @@ sub elf_stuff {
     \@elves
 }
 
+=item stuff_sums($elves)
+
+Return array of sums of all the stuff carried by each elf.
+$elves is a reference to an array of arrays of elf stuff.
+
+=cut
+
+sub stuff_sums {
+    local $_;
+    my @sums = map { sum(@$_) } @{shift()};
+    \@sums
+}
+
 =item mostest_of_the_elves($elves)
 
 Return the total of all the stuff carried by the elf carrying the most stuff.
@@ -42,8 +55,19 @@ $elves is a reference to an array of arrays of elf stuff.
 =cut
 
 sub mostest_of_the_elves {
-    local $_;
-    max map { sum(@$_) } @{shift()}
+    max(@{stuff_sums(@_)})
+}
+
+=item top_three_sum_of_the_elves($elves)
+
+Return the total of all the stuff carried by the top three elves carrying the most stuff.
+$elves is a reference to an array of arrays of elf stuff.
+
+=cut
+
+sub top_three_sum_of_the_elves {
+    my @three = reverse(sort { $a <=> $b } @{stuff_sums(@_)});
+    sum(@three[0 .. 2])
 }
 
 =back
