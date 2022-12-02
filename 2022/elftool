@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+use List::Util qw'max sum';
+
+=head1 NAME
+
+elftool
+
+=head1 FUNCTIONS
+
+=over
+
+=item elf_stuff(@_)
+
+Return array of arrays of the stuff carried by an elf.
+Empty strings delimit elves.
+
+=cut
+
+sub elf_stuff {
+    my @elves;
+    my $elf = [];
+    for my $stuff (@_) {
+        if ($stuff eq '') {
+            push(@elves, $elf);
+            $elf = [];
+            next;
+        }
+        push(@$elf, $stuff)
+    }
+    \@elves
+}
+
+=item mostest_of_the_elves($elves)
+
+Return the total of all the stuff carried by the elf carrying the most stuff.
+$elves is a reference to an array of arrays of elf stuff.
+
+=cut
+
+sub mostest_of_the_elves {
+    local $_;
+    max map { sum(@$_) } @{shift()}
+}
+
+=back
+
+=cut
+
+if (!caller) {
+    exit(main(@ARGV))
+}
+
+1;
