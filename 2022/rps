@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+use List::Util;
+
+=head1 NAME
+
+rps - ROCK PAPER SCISSORS - you know, for ELVES
+
+=cut
+
+use constant {
+    AttackRock => 'A',
+    AttackPapr => 'B',
+    AttackScis => 'C',
+    CountrRock => 'X',
+    CountrPapr => 'Y',
+    CountrScis => 'Z',
+};
+
+my @ATTACKS = (
+    AttackRock,
+    AttackPapr,
+    AttackScis,
+    );
+
+my @COUNTERS = (
+    CountrRock,
+    CountrPapr,
+    CountrScis,
+    );
+
+my %SCORES = (
+    AttackRock, {
+        CountrRock, 1 + 3,
+        CountrPapr, 2 + 6,
+        CountrScis, 3 + 0,
+    },
+    AttackPapr, {
+        CountrRock, 1 + 0,
+        CountrPapr, 2 + 3,
+        CountrScis, 3 + 6,
+    },
+    AttackScis, {
+        CountrRock, 1 + 6,
+        CountrPapr, 2 + 0,
+        CountrScis, 3 + 3,
+    },
+    );
+
+sub strategy_guide {
+    [ map { [ split ] } @_ ]
+}
+
+sub score_round {
+    my $attack = shift;
+    my $countr = shift;
+    $SCORES{$attack}->{$countr}
+}
+
+sub main {
+    my $g = strategy_guide(<>);
+    my $total = 0;
+    for my $round (@$g) {
+        my ($attack, $countr) = @$round;
+        my $score = score_round($attack, $countr);
+        $total += $score;
+        say("$attack vs. $countr => ", $score);
+    }
+    say("total $total");
+    0
+}
+
+if (!caller) {
+    exit(main(@ARGV))
+}
+
+1;
