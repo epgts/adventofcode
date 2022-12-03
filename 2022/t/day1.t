@@ -1,17 +1,35 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
+
+use Test::Differences;
 
 require './elftool';
 
 open(my $fh, '<', 'input/day1') || die;
 my $stuff = elf_stuff(map { chomp; $_ } <$fh>);
 
+my $mostest = 75_622;
 is
     mostest_of_the_elves($stuff),
-    75_622;
+    $mostest;
 
+my $top_three = 213_159;
 is
     top_three_sum_of_the_elves($stuff),
-    213_159;
+    $top_three;
+
+open($fh, '-|', './elftool.com', 'input/day1') || die;
+my @actual = <$fh>;
+close($fh) || die;
+eq_or_diff
+    \@actual,
+    [
+     "found 254 elves\n",
+     "top three:\n",
+     " $mostest\n",
+     " 69383\n",
+     " 68154\n",
+     "top three total: $top_three\n",
+    ];

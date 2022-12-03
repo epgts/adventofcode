@@ -66,13 +66,20 @@ $elves is a reference to an array of arrays of elf stuff.
 =cut
 
 sub top_three_sum_of_the_elves {
-    my @three = reverse(sort { $a <=> $b } @{stuff_sums(@_)});
-    sum(@three[0 .. 2])
+    sum((sort({ $b <=> $a } @{stuff_sums(@_)}))[0 .. 2])
 }
 
 =back
 
 =cut
+
+sub main {
+    my $stuff = elf_stuff(map { chomp; $_ } <>);
+    say('the elf carrying the most calorically great food carries ', mostest_of_the_elves($stuff));
+    say('the top three elves carrying the most calorically caloric food carry in total amongst themselves ',
+        top_three_sum_of_the_elves($stuff));
+    0
+}
 
 if (!caller) {
     exit(main(@ARGV))
