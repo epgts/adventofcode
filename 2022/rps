@@ -18,19 +18,10 @@ use constant {
     CountrRock => 'X',
     CountrPapr => 'Y',
     CountrScis => 'Z',
+    Lose => 'X',
+    Draw => 'Y',
+    Win  => 'Z',
 };
-
-my @ATTACKS = (
-    AttackRock,
-    AttackPapr,
-    AttackScis,
-    );
-
-my @COUNTERS = (
-    CountrRock,
-    CountrPapr,
-    CountrScis,
-    );
 
 my %SCORES = (
     AttackRock, {
@@ -50,6 +41,24 @@ my %SCORES = (
     },
     );
 
+my %HOWTO = (
+    AttackRock, {
+        Lose, CountrScis,
+        Draw, CountrRock,
+        Win,  CountrPapr,
+    },
+    AttackPapr, {
+        Lose, CountrRock,
+        Draw, CountrPapr,
+        Win,  CountrScis,
+    },
+    AttackScis, {
+        Lose, CountrPapr,
+        Draw, CountrScis,
+        Win,  CountrRock,
+    },
+    );
+
 sub strategy_guide {
     [ map { [ split ] } @_ ]
 }
@@ -58,6 +67,12 @@ sub score_round {
     my $attack = shift;
     my $countr = shift;
     $SCORES{$attack}->{$countr}
+}
+
+sub choose_countr {
+    my $attack = shift;
+    my $result = shift;
+    $HOWTO{$attack}->{$result}
 }
 
 sub main {
