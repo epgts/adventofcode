@@ -30,4 +30,14 @@ sub all_ranges_contained {
     1
 }
 
+sub pairs_overlap {
+    my ($al, $ar) = @{shift()};
+    my ($bl, $br) = @{shift()};
+    0
+        || ($bl <= $al && $al <= $br)
+        || ($bl <= $ar && $ar <= $br)
+        || ($al <= $bl && $bl <= $ar)
+        || ($al <= $br && $br <= $ar)
+}
+
 1;
