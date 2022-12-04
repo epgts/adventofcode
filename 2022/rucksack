@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+use List::Util qw'first sum';
+
+=head1 NAME
+
+rucksack - elves have rucksacks and stuff
+
+=head1 FUNCTIONS
+
+=over
+
+=item rucksack($string)
+
+Retrn two arrays of items representing the two compartments of a
+standard-issue ELF RUCKSACK decoded from $string, where each character is
+[A-Za-z] representing the item type and the compartments are even size.
+
+=cut
+
+sub rucksack {
+    local $_;
+    my $packed = shift;
+    my $middle = length($packed) / 2;
+    [
+     map
+     { [ split(//, $_) ] }
+     substr($packed, 0, $middle), substr($packed, $middle)
+    ]
+}
+
+=item priority($type)
+
+Return the priority of an item type.
+
+=cut
+
+sub priority {
+    local $_ = shift;
+    if (/[a-z]/) {
+        return (ord) - 96
+    }
+    if (/[A-Z]/) {
+        return (ord) - 38
+    }
+}
+
+=item first_misclassified_type($rucksack)
+
+Return the first type that appears in both comparments of a rucksack.
+
+=cut
+
+sub first_misclassified_type {
+    local $_;
+    my ($part1, $part2) = @{shift()};
+    my %part1_types = map { $_, 1 } @$part1;
+    first { $part1_types{$_} } @$part2
+}
+
+=back
+
+=cut
+
+sub main {
+    local $_;
+    say sum(map { chomp; priority(first_misclassified_type(rucksack($_))) } <>);
+    0
+}
+
+if (!caller) {
+    exit(main(@ARGV))
+}
+
+1;
