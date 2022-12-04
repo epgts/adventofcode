@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+=head1 NAME
+
+camptool - the elves have a camp and they must tool it
+
+=cut
+
+sub range {
+    [ split(/-/, shift) ]
+}
+
+sub range_pair {
+    local $_;
+    [ map { range($_) } split(/,/, shift) ]
+}
+
+sub all_ranges_contained {
+    my ($l, $r) = @{shift()};
+    for my $range (@_) {
+        if ($range->[0] <= $l && $r <= $range->[1]) {
+            ($l, $r) = @$range;
+        } elsif (!($l <= $range->[0] && $range->[1] <= $r)) {
+            return 0
+        }
+    }
+    1
+}
+
+1;
