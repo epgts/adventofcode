@@ -7,6 +7,8 @@ use Test::Differences;
 
 require './elftool';
 
+use Env 'OBJDIR';
+
 open(my $fh, '<', 'input/day1') || die;
 my $stuff = elf_stuff(map { chomp; $_ } <$fh>);
 
@@ -20,7 +22,7 @@ is
     top_three_sum_of_the_elves($stuff),
     $top_three;
 
-open($fh, '-|', './elftool.com', 'input/day1') || die;
+open($fh, '-|', "$OBJDIR/elftool.com", 'input/day1') || die;
 my @actual = <$fh>;
 close($fh) || die;
 eq_or_diff

@@ -1,38 +1,4 @@
-
-static void
-vfprintf_or_die(FILE *const fp, char const *const fmt, va_list ap)
-{
-	if (vfprintf(fp, fmt, ap) < 0) {
-		if (fp != stderr) {
-			fprintf(stderr, "fprintf(%d): ", fileno(fp));
-		}
-		perror(NULL);
-		exit(4);
-	}
-}
-
-static int VERBOSE = 0;
-
-static void
-LOG(char const *const fmt, ...)
-{
-	if (VERBOSE == 0) {
-		return;
-	}
-	va_list ap;
-	va_start(ap, fmt);
-	vfprintf_or_die(stderr, fmt, ap);
-	va_end(ap);
-}
-
-static void
-output_or_die(FILE *const fp, char const *const fmt, ...)
-{
-	va_list ap;
-	va_start(ap, fmt);
-	vfprintf_or_die(fp, fmt, ap);
-	va_end(ap);
-}
+#include "io.h"
 
 static void
 usage(FILE *const fp)
@@ -50,7 +16,7 @@ main(int argc, char **argv)
 		return 2;
 	}
 
-	if (strcmp(argv[0], "-v") == 0) {
+	if (argc > 0 && strcmp(argv[0], "-v") == 0) {
 		argc--; argv++;
 		VERBOSE++;
 	}
@@ -60,35 +26,11 @@ main(int argc, char **argv)
 		return 2;
 	}
 
-	int const fd = open(argv[0], O_RDONLY);
-	if (fd < 0) {
-		fprintf(stderr, "open(%s): ", argv[0]);
-		perror(NULL);
-		return 3;
-	}
-	struct stat st;
-	if (fstat(fd, &st) < 0) {
-		fprintf(stderr, "stat(%s): ", argv[0]);
-		perror(NULL);
-		return 4;
-	}
-
-	unsigned long long const buflen = st.st_size;
-	// Leave room for a terminating null byte.
-	char *buf = malloc(buflen + 1);
-	int const status = read(fd, buf, st.st_size);
-	if (status < 0) {
-		fprintf(stderr, "read(%s, %llu): ", argv[0], buflen);
-		perror(NULL);
-		return 4;
-	}
-	if (status < st.st_size) {
-		fprintf(stderr,
-			"read(%s, %llu): but only read %llu\n",
-			argv[0],
-			buflen,
-			(unsigned long long)status);
-		return 4;
+	unsigned long long buflen;
+	char *buf;
+	int const status = read_file(&buflen, &buf, argv[0]);
+	if (status != 0) {
+		return 0;
 	}
 
 	if (buf[buflen - 1] != '\n') {
@@ -100,10 +42,6 @@ main(int argc, char **argv)
 		fprintf(stderr, "malformed input:  first byte is LF\n");
 		return 5;
 	}
-
-	buf[buflen] = 0;
-
-	LOG("read %llu bytes from %s:\n%s\n", buflen, argv[0], buf);
 
 	unsigned long long top_three[3] = { 0 };
 	int n_elves = 0;
