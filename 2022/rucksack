@@ -48,6 +48,44 @@ sub priority {
     }
 }
 
+=item elves_come_in_threes(@rucksacks)
+
+Return array of elf groups where each group is an array of three rucksacks.
+Because elves come in threes.
+
+=cut
+
+sub elves_come_in_threes {
+    my @threes;
+    while (my $elf = shift) {
+        push(@threes, [$elf, shift(), shift()]);
+    }
+    \@threes
+}
+
+=item badge
+
+Return the badge for this three-elf group of rucksacks, which is the item type
+contained in all three rucksacks.
+
+=cut
+
+sub badge {
+    my $group = shift;
+    my %types;
+    for my $rucksack (@$group) {
+        my %sack_set;
+        for my $part (@$rucksack) {
+            for my $item (@$part) {
+                if (!$sack_set{$item}++) {
+                    $types{$item}++;
+                    $types{$item} == 3 && return $item
+                }
+            }
+        }
+    }
+}
+
 =item first_misclassified_type($rucksack)
 
 Return the first type that appears in both comparments of a rucksack.
@@ -67,7 +105,10 @@ sub first_misclassified_type {
 
 sub main {
     local $_;
-    say sum(map { chomp; priority(first_misclassified_type(rucksack($_))) } <>);
+
+    my @rucksacks = map { chomp; rucksack($_) } <>;
+    say sum(map { priority(first_misclassified_type($_)) } @rucksacks);
+    say sum(map { priority(badge($_)) } @{elves_come_in_threes(@rucksacks)});
     0
 }
 
