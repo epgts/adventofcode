@@ -1,7 +1,7 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 use Test::Differences;
 
@@ -39,7 +39,7 @@ eq_or_diff
       ]
     ];
 
-rearrange($arrangement, $rearrangement);
+CrateMover9000($arrangement, $rearrangement);
 eq_or_diff
     $arrangement,
     [
@@ -55,7 +55,15 @@ eq_or_diff
 open(my $fh, '<', 'input/day5') || die;
 my @input = map { chomp; $_ } <$fh>;
 ($arrangement, $rearrangement) = read_arrangement_and_re(\@input);
-rearrange($arrangement, $rearrangement);
+CrateMover9000($arrangement, $rearrangement);
 is
     join('', take_tops($arrangement)),
     'QNHWJVJZW';
+
+open($fh, '<', 'input/day5') || die;
+@input = map { chomp; $_ } <$fh>;
+($arrangement, $rearrangement) = read_arrangement_and_re(\@input);
+CrateMover9001($arrangement, $rearrangement);
+is
+    join('', take_tops($arrangement)),
+    'BPCZJLFJW';

@@ -49,26 +49,40 @@ sub read_arrangement_and_re {
 }
 
 sub take {
-    shift(@{shift()}) // die('empty stack!')
+    my $stack = shift;
+    my $count = shift;
+    my @cells;
+    while ($count--) {
+        push(@cells, shift(@$stack) // die('empty stack!'))
+    }
+    @cells
 }
 
 sub place {
-    unshift(@{shift()}, shift)
+    unshift(@{shift()}, @_)
 }
 
-sub rearrange {
+sub CrateMover9000 {
     my $stacks = shift;
     for my $command (@{shift()}) {
         my ($count, $src, $dst) = @$command;
         for (my $i = 0; $i < $count; $i++) {
-            place($stacks->[$dst], take($stacks->[$src]));
+            place($stacks->[$dst], take($stacks->[$src], 1));
         }
+    }
+}
+
+sub CrateMover9001 {
+    my $stacks = shift;
+    for my $command (@{shift()}) {
+        my ($count, $src, $dst) = @$command;
+        place($stacks->[$dst], take($stacks->[$src], $count))
     }
 }
 
 sub take_tops {
     local $_;
-    map { take($_) } @{shift()}
+    map { take($_, 1) } @{shift()}
 }
 
 1;
