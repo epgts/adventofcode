@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+=head1 NAME
+
+supplies - stackin and movin
+
+=cut
+
+sub read_arrangement {
+    my $rows = shift;
+    # My input and example input both pad all lines with blanks such that all
+    # lines in the table have the same length.  Depend on that for simplicity.
+    my $row_len = length($rows->[0]);
+    #my $stack_count = int($row_len / 4 + 1);
+    my $stacks;
+    for (my $row = shift(@$rows); defined($row); $row = shift(@$rows)) {
+        if ($row =~ /^ 1/) {
+            # This is the last of the arrangement table and it numbers the
+            # columns.  But we can count, so just ignore it.
+            return $stacks
+        }
+        my $stack = 0;
+        for (my $i = 0; $i < $row_len; $stack++, $i += 4) {
+            my $crate = substr($row, $i + 1, 1);
+            if ($crate ne ' ') {
+                push(@{$stacks->[$stack]}, $crate)
+            }
+        }
+    }
+}
+
+sub read_rearrangement {
+    my @commands;
+    for my $command (@{shift()}) {
+        my ($move, $count, $from, $src, $to, $dst) = split(' ', $command);
+        push(@commands, [$count, $src - 1, $dst - 1]);
+    }
+    \@commands
+}
+
+sub read_arrangement_and_re {
+    my $lines = shift;
+    my $arrangement = read_arrangement($lines);
+    shift(@$lines) eq '' || die('blank line required between arrangement table and rearrangement instructions not');
+    $arrangement, read_rearrangement($lines)
+}
+
+sub take {
+    shift(@{shift()}) // die('empty stack!')
+}
+
+sub place {
+    unshift(@{shift()}, shift)
+}
+
+sub rearrange {
+    my $stacks = shift;
+    for my $command (@{shift()}) {
+        my ($count, $src, $dst) = @$command;
+        for (my $i = 0; $i < $count; $i++) {
+            place($stacks->[$dst], take($stacks->[$src]));
+        }
+    }
+}
+
+sub take_tops {
+    local $_;
+    map { take($_) } @{shift()}
+}
+
+1;
