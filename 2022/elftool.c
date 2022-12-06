@@ -11,11 +11,6 @@ main(int argc, char **argv)
 {
 	argc--; argv++;
 
-	if (argc < 1) {
-		usage(stderr);
-		return 2;
-	}
-
 	if (argc > 0 && strcmp(argv[0], "-v") == 0) {
 		argc--; argv++;
 		VERBOSE++;
@@ -30,7 +25,7 @@ main(int argc, char **argv)
 	char *buf;
 	int const status = read_file(&buflen, &buf, argv[0]);
 	if (status != 0) {
-		return 0;
+		return status;
 	}
 
 	if (buf[buflen - 1] != '\n') {

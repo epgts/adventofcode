@@ -1,14 +1,14 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use List::Util 'sum';
 use Test::Differences;
 
 require './rucksack';
 
-open(my $fh, '<', 'input/day3') || die;
+use Env 'OBJDIR';
 
 eq_or_diff
     [ map { join('', @$_) } @{rucksack('vJrwpWtwJgWrhcsFMMfFFhFp')} ],
@@ -34,14 +34,22 @@ is
     badge($groups->[1]),
     'Z';
 
+open(my $fh, '<', 'input/day3') || die;
 @rucksacks = map { chomp; rucksack($_) } <$fh>;
 
+my $problem1 = 8185;
 is
     sum(map { priority(first_misclassified_type($_)) } @rucksacks),
-    8185;
+    $problem1;
 
 $groups = elves_come_in_threes(@rucksacks);
 
+my $problem2 = 2817;
 is
     sum(map { priority(badge($_)) } @$groups),
-    2817;
+    $problem2;
+
+open($fh, '-|', "$OBJDIR/rucksack.com", 'input/day3') || die;
+is
+    scalar(<$fh>),
+    "$problem1 $problem2\n";

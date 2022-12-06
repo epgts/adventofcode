@@ -71,7 +71,7 @@ choose_countr(enum Attack const attack, enum Outcome const goal)
 		}
 	}
 	CHECK(0, "HOWTO table incomplete");
-};
+}
 
 static void
 usage(FILE *const fp)
@@ -83,11 +83,6 @@ int
 main(int argc, char **argv)
 {
 	argc--; argv++;
-
-	if (argc < 1) {
-		usage(stderr);
-		return 2;
-	}
 
 	if (argc > 0 && strcmp(argv[0], "-v") == 0) {
 		argc--; argv++;
@@ -103,7 +98,7 @@ main(int argc, char **argv)
 	char *buf;
 	int const status = read_file(&buflen, &buf, argv[0]);
 	if (status != 0) {
-		return 0;
+		return status;
 	}
 
 	int p1 = 0, p2 = 0;

@@ -15,7 +15,7 @@ COSMO_LD=	sh -c '${CC} -g -Os -static -nostdlib -fno-pie -no-pie -mno-red-zone -
 
 SELF=	GNUmakefile
 
-all: ${OBJDIR}/elftool.com ${OBJDIR}/rps.com
+all: ${OBJDIR}/elftool.com ${OBJDIR}/rps.com ${OBJDIR}/rucksack.com
 
 test: all
 	OBJDIR=${OBJDIR} prove -r t
@@ -28,8 +28,14 @@ RPS_OBJ=	${OBJDIR}/rps.o ${OBJDIR}/io.o
 ${OBJDIR}/rps.com.dbg: ${RPS_OBJ}
 	${COSMO_LD} -o ${OBJDIR}/rps.com.dbg ${RPS_OBJ}
 
+RUCKSACK_OBJ=	${OBJDIR}/rucksack.o ${OBJDIR}/io.o
+${OBJDIR}/rucksack.com.dbg: ${RUCKSACK_OBJ}
+	${COSMO_LD} -o ${OBJDIR}/rucksack.com.dbg ${RUCKSACK_OBJ}
+
 ${OBJDIR}/elftool.o: io.h
+${OBJDIR}/io.o: io.h
 ${OBJDIR}/rps.o: io.h
+${OBJDIR}/rucksack.o: io.h
 
 ${OBJDIR}/%.o: %.c ${SELF}
 	${COSMO_CC} -o $@ $<

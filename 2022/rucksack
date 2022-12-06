@@ -95,6 +95,7 @@ Return the first type that appears in both comparments of a rucksack.
 sub first_misclassified_type {
     local $_;
     my ($part1, $part2) = @{shift()};
+    # TODO What!  I got lucky?!  I didn't implement the rule about types being case-insensitive...
     my %part1_types = map { $_, 1 } @$part1;
     first { $part1_types{$_} } @$part2
 }
