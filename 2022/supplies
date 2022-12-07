@@ -44,7 +44,7 @@ sub read_rearrangement {
 sub read_arrangement_and_re {
     my $lines = shift;
     my $arrangement = read_arrangement($lines);
-    shift(@$lines) eq '' || die('blank line required between arrangement table and rearrangement instructions not');
+    (shift(@$lines) // 'defined') eq '' || die('blank line required between arrangement table and rearrangement instructions');
     $arrangement, read_rearrangement($lines)
 }
 
