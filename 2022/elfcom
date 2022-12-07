@@ -8,7 +8,7 @@ use List::Util 'first';
 sub start_of_packet {
     local $_;
     my @stream = split('', shift);
-    my $target = 4;
+    my $target = shift;
     my %d;
     my @chars;
     my $i;
