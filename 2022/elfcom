@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+use List::Util 'first';
+
+sub start_of_packet {
+    local $_;
+    my @stream = split('', shift);
+    my $target = 4;
+    my %d;
+    my @chars;
+    my $i;
+    for ($i = 0; $i < $target; $i++) {
+        my $char = shift(@stream);
+        $d{$char}++;
+        push(@chars, $char);
+    }
+    for (; @stream; $i++) {
+        if (!defined(first { $_ > 1 } values(%d))) {
+            return $i;
+        }
+        my $oldest = shift(@chars);
+        $d{$oldest}--;
+        my $char = shift(@stream);
+        $d{$char}++;
+        push(@chars, $char);
+    }
+    die;
+}
+
+1;
