@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+sub read_transcript {
+    local $_;
+    my @blocks = split(/\n\$/,shift);
+    @blocks > 0 || die('malformed input:  command prompts not found');
+    $blocks[0] =~ s/^\$// || die("malformed input:  first command prompt not found $blocks[0]");
+    $blocks[0] eq ' cd /' || die("malformed input:  first command must be cd / $blocks[0]");
+    [
+     map {
+         s/^ ([^\n]+)(\n|$)// || die("malformed input:  failed to extract command from $_");
+         my $command = $1;
+         [ [split(' ', $command)], $_ ]
+     } @blocks
+    ]
+}
+
+sub du {
+    my %dirs;
+    my @cwd;                    # TODO is start defined?
+    for my $run (@{shift()}) {
+        my ($cl, $output) = @$run;
+        my ($command, @args) = @$cl;
+        if ($command eq 'cd') {
+            scalar(@args) == 1 || die;
+            if ($args[0] eq '/') {
+                # absolute path
+                @cwd = ();
+            } else {
+                my @components = split(m|/+|, $args[0]); # TODO repeated / in spec?  i allow it...
+                if ($components[0] eq '') {
+                    die('cd / should have been handled above')
+                }
+                for my $component (@components) {
+                    if ($component eq '.') {
+                        # self - ignore
+                    } elsif ($component eq '..') {
+                        pop(@cwd) // die('cd /..'); # TODO or is this to be ignored?
+                    } else {
+                        push(@cwd, $component);
+                    }
+                }
+            }
+        } elsif ($command eq 'ls') {
+            scalar(@args) == 0 || die('ls ought to accept arguments but does it happen in input?');
+            for my $line (split(/\n/, $output)) {
+                $line =~ /^(\d+)/ || next;
+                my $size = $1;
+                my @components = @cwd;
+                do {
+                    $dirs{join('/', @components)} += $size;
+                } while (defined(pop(@components)));
+            }
+        } else {
+            die(join(' ', 'unknown command:', $command, @args))
+        }
+    }
+    \%dirs
+}
+
+1;
