@@ -1,7 +1,7 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use List::Util 'sum';
 use Test::Differences;
@@ -50,6 +50,11 @@ is
     $problem2;
 
 open($fh, '-|', "$OBJDIR/rucksack.com", 'input/day3') || die;
+is
+    scalar(<$fh>),
+    "$problem1 $problem2\n";
+
+open($fh, '-|', "$OBJDIR/rucksack", 'input/day3') || die;
 is
     scalar(<$fh>),
     "$problem1 $problem2\n";

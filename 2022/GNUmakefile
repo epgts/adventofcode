@@ -13,9 +13,11 @@ COSMO=		${OBJDIR}/cosmo
 COSMO_CC=	${CC} -c -g -Os -nostdinc -fno-pie -no-pie -mno-red-zone -fno-omit-frame-pointer -pg -mnop-mcount -mno-tls-direct-seg-refs -gdwarf-4 -include ${COSMO}/cosmopolitan.h
 COSMO_LD=	sh -c '${CC} -g -Os -static -nostdlib -fno-pie -no-pie -mno-red-zone -fno-omit-frame-pointer -pg -mnop-mcount -mno-tls-direct-seg-refs -gdwarf-4 "$$@" -fuse-ld=bfd -Wl,-T,${COSMO}/ape.lds -Wl,--gc-sections ${COSMO}/crt.o ${COSMO}/ape-no-modify-self.o ${COSMO}/cosmopolitan.a' argv0
 
+RUSTC=		rustc
+
 SELF=	GNUmakefile
 
-all: ${OBJDIR}/elftool.com ${OBJDIR}/rps.com ${OBJDIR}/rucksack.com
+all: ${OBJDIR}/elftool.com ${OBJDIR}/rps.com ${OBJDIR}/rucksack.com ${OBJDIR}/rucksack
 
 test: all
 	OBJDIR=${OBJDIR} prove -r t
@@ -39,6 +41,9 @@ ${OBJDIR}/rucksack.o: io.h
 
 ${OBJDIR}/%.o: %.c ${SELF}
 	${COSMO_CC} -o $@ $<
+
+${OBJDIR}/%: %.rs ${SELF}
+	${RUSTC} -o $@ $<
 
 ${OBJDIR}/%.com: ${OBJDIR}/%.com.dbg
 	objcopy -S -O binary $< $@
