@@ -1,7 +1,7 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 use List::Util 'sum';
 
@@ -41,12 +41,18 @@ is $du->{d}, 24933642;
 is $du->{''}, 48381165;
 
 is
-    sum(grep { $_ <= 100000 } values(%$du)),
-    95437;
+    sum(grep { $_ <= 100_000 } values(%$du)),
+    95_437;
 
 open(my $fh, '<', 'input/day7') || die;
 # lol oops should have just taken list of lines to begin with
 my $input = join('', <$fh>);
+$du = du(read_transcript($input));
+# part 1
 is
-    sum(grep { $_ <= 100000 } values(%{du(read_transcript($input))})),
-    95437;
+    sum(grep { $_ <= 100_000 } values(%$du)),
+    1_501_149;
+# part 2
+is
+    smallest_dir_to_free(70_000_000, 30_000_000, $du),
+    10_096_985;

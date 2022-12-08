@@ -61,4 +61,16 @@ sub du {
     \%dirs
 }
 
+sub smallest_dir_to_free {
+    my $avail = shift;
+    my $target = shift;
+    my $du = shift;
+    my $need = $target - ($avail - $du->{''});
+    for my $size (sort({ $a <=> $b } values(%$du))) {
+        if ($size >= $need) {
+            return $size
+        }
+    }
+}
+
 1;
