@@ -1,7 +1,7 @@
 use v5.12;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 24;
 
 require './trees';
 
@@ -57,6 +57,24 @@ is $example[3]->[3], 4;
 ok !$map[3]->[3];
 
 open(my $fh, '<', 'input/day8') || die;
-@example = map { chomp; [ split('', $_) ] } <$fh>;
-@map = @{map_visibility(\@example)};
+my @input = map { chomp; [ split('', $_) ] } <$fh>;
+@map = @{map_visibility(\@input)};
 is count_visible(\@map), 1688;
+
+# Problem 2
+
+is
+    scenic_score(\@example, 1, 2),
+    4;
+
+is
+    scenic_score(\@example, 3, 2),
+    8;
+
+is
+    highest_scenic_score(\@example),
+    8;
+
+is
+    highest_scenic_score(\@input),
+    410400;

@@ -103,4 +103,68 @@ sub map_visibility {
     \@map
 }
 
+sub scenic_score {
+    my $trees = shift;
+    my $y = shift;
+    my $x = shift;
+    my ($width, $height) = (scalar(@{$trees->[0]}), scalar(@$trees));
+
+    if ($x == 0 || $x == $width - 1
+        || $y == 0 || $y == $height - 1) {
+        # Scores of 0 in one direction => overall score of 0.
+        return 0
+    }
+
+    my $score = 1;
+    my $i;
+    # Look right each row.
+    for ($i = 1; $x + $i <= $width; $i++) {
+        if ($x + $i == $width - 1 || $trees->[$y]->[$x + $i] >= $trees->[$y]->[$x]) {
+            $score *= $i;
+            last
+        }
+    }
+
+    # Look down each column.
+    for ($i = 1; $y + $i <= $height; $i++) {
+        if ($y + $i == $height - 1 || $trees->[$y + $i]->[$x] >= $trees->[$y]->[$x]) {
+            $score *= $i;
+            last
+        }
+    }
+
+    # Look left each row.
+    for ($i = 1; $x - $i >= 0; $i++) {
+        if ($x - $i == 0 || $trees->[$y]->[$x - $i] >= $trees->[$y]->[$x]) {
+            $score *= $i;
+            last
+        }
+    }
+
+    # Look up each column.
+    for ($i = 1; $y - $i >= 0; $i++) {
+        if ($y - $i == 0 || $trees->[$y - $i]->[$x] >= $trees->[$y]->[$x]) {
+            $score *= $i;
+            last
+        }
+    }
+
+    $score
+}
+
+sub highest_scenic_score {
+    my $trees = shift;
+    my ($width, $height) = (scalar(@{$trees->[0]}), scalar(@$trees));
+    my $highest = 0;
+    for (my $y = 1; $y < $height - 1; $y++) {
+        for (my $x = 1; $x < $width - 1; $x++) {
+            my $score = scenic_score($trees, $y, $x);
+            if ($score > $highest) {
+                $highest = $score
+            }
+        }
+    }
+    $highest
+}
+
 1;
