@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+
+=head1 NAME
+
+trees - i think that i shall never see a elf as lovely as a tree
+
+=cut
+
+sub count_visible {
+    my $map = shift;
+    my $visible;
+    for my $row (@$map) {
+        for my $cell (@$row) {
+            $visible += defined($cell)
+        }
+    }
+    $visible
+}
+
+sub map_visibility {
+    my $trees = shift;
+    my ($width, $height) = (scalar(@{$trees->[0]}), scalar(@$trees));
+
+    my @map;
+    # Initialize the corners, skipped below.
+    $map[0]->[0] = $map[0]->[$width - 1] = $map[$height - 1]->[0] = $map[$height - 1]->[$width - 1] = 1;
+
+    # Look right each row.
+    for (my $y = 1; $y < $height - 1; $y++) {
+        $map[$y]->[0]++;
+        for (my $x = 1; $x < $width - 1; $x++) {
+            my $yes = 1;
+            my $outer;
+            for ($outer = $x - 1; $outer >= 0; $outer--) {
+                if ($trees->[$y]->[$x] <= $trees->[$y]->[$outer]) {
+                    $yes = 0;
+                    last
+                }
+            }
+            if ($yes) {
+                $map[$y]->[$x]++;
+            }
+        }
+    }
+
+    # Look down each column.
+    for (my $x = 1; $x < $width - 1; $x++) {
+        $map[0]->[$x]++;
+        for (my $y = 1; $y < $height - 1; $y++) {
+            my $yes = 1;
+            my $outer;
+            for ($outer = $y - 1; $outer >= 0; $outer--) {
+                if ($trees->[$y]->[$x] <= $trees->[$outer]->[$x]) {
+                    $yes = 0;
+                    last
+                }
+            }
+            if ($yes) {
+                $map[$y]->[$x]++;
+            }
+        }
+    }
+
+    # Look left each row.
+    for (my $y = 1; $y < $height - 1; $y++) {
+        $map[$y]->[$width - 1]++;
+        for (my $x = $width - 2; $x > 0; $x--) {
+            my $yes = 1;
+            my $outer;
+            for ($outer = $x + 1; $outer < $width; $outer++) {
+                if ($trees->[$y]->[$x] <= $trees->[$y]->[$outer]) {
+                    $yes = 0;
+                    last
+                }
+            }
+            if ($yes) {
+                $map[$y]->[$x]++;
+            }
+        }
+    }
+
+    # Look up each column.
+    for (my $x = 1; $x < $width - 1; $x++) {
+        $map[$height - 1]->[$x]++;
+        for (my $y = $height - 2; $y > 0; $y--) {
+            my $yes = 1;
+            my $outer;
+            for ($outer = $y + 1; $outer < $height; $outer++) {
+                if ($trees->[$y]->[$x] <= $trees->[$outer]->[$x]) {
+                    $yes = 0;
+                    last
+                }
+            }
+            if ($yes) {
+                $map[$y]->[$x]++;
+            }
+        }
+    }
+
+    \@map
+}
+
+1;
